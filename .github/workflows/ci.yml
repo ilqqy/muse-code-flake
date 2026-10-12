@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # One native runner per published platform: x86_64-linux, aarch64-linux.
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+
+      # The flake's own nixpkgs allows the unfree muse-code package, so no
+      # NIXPKGS_ALLOW_UNFREE/--impure is needed.
+      - name: Flake check
+        run: nix flake check -L
+
+      - name: Build
+        run: nix build -L .#default
+
+      - name: Smoke test
+        run: ./result/bin/muse --version

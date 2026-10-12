@@ -1,0 +1,89 @@
+name: Update
+
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.update.outputs.changed }}
+      from: ${{ steps.update.outputs.from }}
+      version: ${{ steps.update.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+
+      - name: Run update.sh
+        id: update
+        run: |
+          from="$(jq -r .version sources.json)"
+          nix shell --inputs-from . nixpkgs#curl nixpkgs#jq --command ./scripts/update.sh
+          if git diff --quiet -- sources.json; then
+            echo "changed=false" >>"$GITHUB_OUTPUT"
+          else
+            {
+              echo "changed=true"
+              echo "from=$from"
+              echo "version=$(jq -r .version sources.json)"
+            } >>"$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: steps.update.outputs.changed == 'true'
+        with:
+          name: sources
+          path: sources.json
+
+  build:
+    name: build (${{ matrix.runner }})
+    needs: resolve
+    if: needs.resolve.outputs.changed == 'true'
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: sources
+      - uses: DeterminateSystems/nix-installer-action@v23
+
+      - name: Build
+        run: nix build -L .#default
+
+      - name: Smoke test
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: ./result/bin/muse --version | tee /dev/stderr | grep -qF -- "$VERSION"
+
+  commit:
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: sources
+
+      - name: Commit to main
+        env:
+          FROM: ${{ needs.resolve.outputs.from }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "muse-code: $FROM -> $VERSION" -- sources.json
+          git push
