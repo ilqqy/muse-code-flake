@@ -1,0 +1,14 @@
+{
+  "channel": "muse-stable",
+  "version": "1.4.6-R6000.1",
+  "platforms": {
+    "aarch64-linux": {
+      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.6-R6000.1&file=muse-aarch64-linux",
+      "hash": "sha256-/bt/GoXV+gcnJTcmeFqUDoa9u184hbsO0YJld4H1qpM="
+    },
+    "x86_64-linux": {
+      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.6-R6000.1&file=muse-x86-linux",
+      "hash": "sha256-gqSVVCllpbYlb3rNuBaTRRwoZApBnVUorYNA6pPzb28="
+    }
+  }
+}
