@@ -1,14 +1,14 @@
 {
   "channel": "muse-stable",
-  "version": "1.4.24-R9131.1",
+  "version": "1.4.25-R9361.1",
   "platforms": {
     "aarch64-linux": {
-      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.24-R9131.1&file=muse-aarch64-linux",
-      "hash": "sha256-MdTB/fOC5nEbHIhU2XamCV/kdD6xeyqPmlu0Ou9brWM="
+      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.25-R9361.1&file=muse-aarch64-linux",
+      "hash": "sha256-j+CJEV7xN4efykaYbVXt8Y1dOrnP22RBxn6dGAe0EIo="
     },
     "x86_64-linux": {
-      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.24-R9131.1&file=muse-x86-linux",
-      "hash": "sha256-11LEXc4HnuKeEYgEsJHYGsKxuJtn8xe0oWL6GvEgZGU="
+      "url": "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=1.4.25-R9361.1&file=muse-x86-linux",
+      "hash": "sha256-wbco+5cyUDxeGGnjrS8sm9tbJjj7TPOY1uLEaqbY+Uo="
     }
   }
 }
